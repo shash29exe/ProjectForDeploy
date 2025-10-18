@@ -13,3 +13,6 @@ pycache/
 # ▶️ Md and CSV
 *.md
 !README.md
+
+# ▶️ Database
+*.db
