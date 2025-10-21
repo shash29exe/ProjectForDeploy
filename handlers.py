@@ -32,6 +32,7 @@ async def start(message: types.Message):
 
     session.close()
 
+
 @router.message(Command('bio'))
 async def bio(message: types.Message):
     session = SessionLocal()
@@ -52,6 +53,7 @@ async def bio(message: types.Message):
 
     session.close()
 
+
 @router.message(Command('history'))
 async def history(message: types.Message):
     session = SessionLocal()
@@ -68,7 +70,7 @@ async def history(message: types.Message):
                     all()
         )
         if messages:
-            text='\n'.join([f'{msg.message_time}: {msg.text}' for msg in messages])
+            text='\n'.join([f'{msg.message_time}: {msg.message_text}' for msg in messages])
             await message.answer(f'Последние 3 сообщения:\n{text}')
 
         else:
@@ -76,5 +78,18 @@ async def history(message: types.Message):
 
     else:
         await message.answer("Вы не зарегистрированы.")
+
+    session.close()
+
+
+@router.message(F.text.regexp(r"^(?!\/).+"))
+async def log_message(message: types.Message):
+    session = SessionLocal()
+    user = session.query(User).filter(User.telegram_id == message.from_user.id).first()
+
+    if user:
+        log = MessageLog(user_id=user.id, message_text=message.text)
+        session.add(log)
+        session.commit()
 
     session.close()
